@@ -1,7 +1,12 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 
 app = FastAPI()
+
+@app.get("/health", status_code=200)
+async def health_check():
+    return JSONResponse(content={"status": "healthy"}, status_code=200)
+
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
