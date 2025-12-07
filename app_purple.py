@@ -1,14 +1,44 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.responses import HTMLResponse, JSONResponse
 
 app = FastAPI()
 
-@app.get("/health", status_code=200)
-async def health_check():
-    return JSONResponse(content={"status": "healthy"}, status_code=200)
+# --- GLOBAL STATE ---
+# We use this variable to simulate whether the app is broken or not.
+is_healthy = True
 
+# 1. HEALTH CHECK ENDPOINT (Cloud Run uses this)
+@app.get("/health")
+async def health_check(response: Response):
+    global is_healthy
+    if is_healthy:
+        # Normal state: Respond with 200 OK
+        response.status_code = status.HTTP_200_OK
+        return {"status": "healthy"}
+    else:
+        # Broken state: Respond with 500 Error
+        # Cloud Run will see this and eventually kill the container
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"status": "unhealthy"}
 
+# 2. KILL SWITCH (Visit this to simulate a crash)
+@app.get("/break")
+async def break_app():
+    global is_healthy
+    is_healthy = False
+    return {
+        "message": "APP BROKEN! The health check will now return 500 Error.",
+        "instruction": "Wait 2 minutes for Cloud Run to restart me, or visit /heal to fix manually."
+    }
 
+# 3. HEAL BUTTON (Visit this to fix it manually without waiting)
+@app.get("/heal")
+async def heal_app():
+    global is_healthy
+    is_healthy = True
+    return {"message": "APP HEALED! The health check is passing again."}
+
+# 4. MAIN HOMEPAGE (The Purple Screen)
 @app.get("/", response_class=HTMLResponse)
 async def read_root():
     return """

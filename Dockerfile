@@ -20,4 +20,8 @@ EXPOSE 8080
 
 # 7. Define the command to start the app
 # Note: You will need to change 'app_blue:app' depending on which color you are building
+
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD curl -f http://localhost:8080/health || exit 1
+
 CMD ["uvicorn", "app_purple:app", "--host", "0.0.0.0", "--port", "8080"]
