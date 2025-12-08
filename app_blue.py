@@ -62,7 +62,7 @@ async def read_root():
             </style>
         </head>
         <body>
-            <h1>This is Blue Deployment from FastAPI</h1>
+            <h1>This is Blue Deployment from FastAPI - Docker</h1>
             <p>Try visiting <a href="/break" style="color: yellow;">/break</a> to test the health check failure.</p>
         </body>
     </html>
@@ -71,4 +71,5 @@ async def read_root():
 if __name__ == "__main__":
     import uvicorn
     # Cloud Run will ignore this and use the Dockerfile CMD, but this helps for local testing
+
     uvicorn.run(app, host="0.0.0.0", port=8001)
