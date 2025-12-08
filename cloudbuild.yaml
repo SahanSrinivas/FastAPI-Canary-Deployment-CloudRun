@@ -24,3 +24,6 @@ substitutions:
   _SERVICE_NAME: 'my-python-service'
 
 timeout: '1200s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
