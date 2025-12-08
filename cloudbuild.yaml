@@ -1,0 +1,26 @@
+steps:
+  # STEP 1: Build the container image
+  # Uses the 'docker' cloud builder
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/sampleprojecttesting-478502/python-app-fastapi-docker/my-app:v1', '.']
+
+  # STEP 2: Push the image to Artifact Registry
+  # Uses the 'docker' cloud builder again
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/sampleprojecttesting-478502/python-app-fastapi-docker/my-app:v1']
+
+  # STEP 3: Deploy to Cloud Run
+  # Uses the 'gcloud' cloud builder
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'my-python-service'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/sampleprojecttesting-478502/python-app-fastapi-docker/my-app:v1'
+      - '--region'
+      - 'us-central1'
+      - '--allow-unauthenticated'
+
+# Optional: Define timeout or substitutions
+timeout: '1200s'
